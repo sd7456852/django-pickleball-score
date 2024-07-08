@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pickleball Score Keeper</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .court {
+            position: relative;
+            width: 600px;
+            height: 300px;
+            margin: 0 auto;
+            background: url('/static/game/images/court.png') no-repeat center;
+            background-size: cover;
+        }
+        .player {
+            position: absolute;
+            width: 50%;
+            text-align: center;
+            font-weight: bold;
+        }
+        .team1-player1 {
+            top: 30px;
+            left: 0;
+        }
+        .team1-player2 {
+            top: 130px;
+            left: 0;
+        }
+        .team2-player1 {
+            top: 30px;
+            right: 0;
+        }
+        .team2-player2 {
+            top: 130px;
+            right: 0;
+        }
+        .scores {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .team-info {
+            display: inline-block;
+            margin: 10px;
+        }
+        .red-text {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pickleball Score Keeper</h1>
+    <div class="court">
+        <div class="player team1-player1">{{ teams.team1.players.0 }}</div>
+        <div class="player team1-player2">{{ teams.team1.players.1 }}</div>
+        <div class="player team2-player1">{{ teams.team2.players.1 }}</div>
+        <div class="player team2-player2">{{ teams.team2.players.0 }}</div>
+    </div>
+    <div class="scores">
+        <p>{{ teams.team1.name }} Score: {{ teams.team1.score }}</p>
+        <p>{{ teams.team2.name }} Score: {{ teams.team2.score }}</p>
+    </div>
+    <div class="buttons">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="action" value="swap_teams">Swap Teams</button>
+            <button type="submit" name="action" value="reset_names">Reset Names and Players</button>
+        </form>
+    </div>
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        <div class="team-info">
+            <div>
+                <label>Team 1 Name:</label>
+                <input type="text" name="team1_name" value="{{ teams.team1.name }}" {% if teams.team1.name_locked %}disabled{% endif %}>
+            </div>
+            <div>
+                <label>Player 1:</label>
+                <input type="text" name="player1" value="{{ teams.team1.original_players.0 }}" {% if teams.team1.players_locked %}disabled{% endif %}>
+            </div>
+            <div>
+                <label>Player 2:</label>
+                <input type="text" id="player2" name="player2" value="{{ teams.team1.players.1 }}" {% if teams.team1.players_locked %}disabled{% endif %} class="{% if forloop.counter0 == 1 %}red-text{% endif %}">
+            </div>
+        </div>
+        <div class="team-info">
+            <div>
+                <label>Team 2 Name:</label>
+                <input type="text" name="team2_name" value="{{ teams.team2.name }}" {% if teams.team2.name_locked %}disabled{% endif %}>
+            </div>
+            <div>
+                <label>Player 3:</label>
+                <input type="text" id="player3" name="player3" value="{{ teams.team2.players.0 }}" {% if teams.team2.players_locked %}disabled{% endif %} class="{% if forloop.counter0 == 0 %}red-text{% endif %}">
+            </div>
+            <div>
+                <label>Player 4:</label>
+                <input type="text" name="player4" value="{{ teams.team2.original_players.1 }}" {% if teams.team2.players_locked %}disabled{% endif %} class="{% if forloop.counter0 == 1 %}red-text{% endif %}">>
+            </div>
+        </div>
+        <div>
+            <label>{{ teams.team1.name }} Score:</label>
+            <input type="number" name="team1_score" value="{{ teams.team1.score }}">
+        </div>
+        <div>
+            <label>{{ teams.team2.name }} Score:</label>
+            <input type="number" name="team2_score" value="{{ teams.team2.score }}">
+        </div>
+        <br>
+        <button type="submit">Update Scores</button>
+    </form>
+    <br>
+    <div style="text-align: center;">
+        <a href="{% url 'reset_scores' %}">Reset Scores</a>
+    </div>
+</body>
+</html>
